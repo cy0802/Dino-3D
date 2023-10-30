@@ -30,9 +30,6 @@
     <ClCompile Include="..\Shader\Shader.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
-    <ClCompile Include="..\Light\Light.cpp">
-      <Filter>來源檔案</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Dino\Dino.h">

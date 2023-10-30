@@ -7,7 +7,6 @@ in vec3 normal;
 struct Light {
 	vec3 position;
     vec3 color;
-    vec3 constants; // for attenuation
     
     vec3 ambient;
 };
@@ -19,16 +18,13 @@ uniform vec3 viewPos;
 uniform Light light[2];
 
 void main(){
-    // vec3 objectColor = vec3(0.478431, 0.517647, 0.552941);
     vec3 normalized = normalize(normal);
     vec3 viewDir = normalize(viewPos - fragPos);
     
     vec3 result = calcLight(light[0], normalized, viewDir);
     result += calcLight(light[1], normalized, viewDir);
     
-    // FragColor = vec4(light[0].color, 1.0);
 	FragColor = vec4(result * objectColor, 1.0);
-	// FragColor = texture(_texture, TexCoord);
 }
 vec3 calcLight(Light light, vec3 normal, vec3 viewDir){
     vec3 lightDir = normalize(light.position - fragPos);
@@ -40,11 +36,6 @@ vec3 calcLight(Light light, vec3 normal, vec3 viewDir){
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
     vec3 specular = specularStrength * spec * light.color;  
 
-    // float distance = length(light.position - fragPos);
-    // float attenuation = 0.05f;
-    // float attenuation = 1.0 / (light.constants.x + light.constants.y * distance + light.constants.z * (distance * distance));
     vec3 ambient = light.ambient;
-    // diffuse = attenuation * diffuse;
-    // specular = attenuation * specular;
     return ambient + diffuse + specular;
 }

@@ -12,7 +12,6 @@
 #include "ObjReader/ObjReader.h" 
 #include "Dino/Dino.h"
 #include "Light/Light.h"
-#include "TestCube/TestCube.h"
 
 
 const unsigned int SCR_WIDTH = 1300;
@@ -24,8 +23,8 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
     GLsizei length, const GLchar* message, const void* userParam);
 Dino dino;
-Light light0(glm::vec3(1.0f, 1.0f, 3.0f), glm::vec3(1.0, 0.7, 1.8));
-Light light1(glm::vec3(-1.0f, -1.0f, 3.0f), glm::vec3(1.0, 0.7, 1.8));
+Light light0(glm::vec3(1.0f, 1.0f, 3.0f));
+Light light1(glm::vec3(-1.0f, -1.0f, 3.0f));
 glm::vec3 camera = glm::vec3(0.0, 0.0, 0.0);
 
 // for mouse input
@@ -72,8 +71,6 @@ int main() {
     shader.setVec3((char*)"light[1].position", light1.position);
     shader.setVec3((char*)"light[0].color", light0.color);
     shader.setVec3((char*)"light[1].color", light1.color);
-    shader.setVec3((char*)"light[0].constants", light0.constants);
-    shader.setVec3((char*)"light[1].constants", light1.constants);
     shader.setVec3((char*)"light[0].ambient", glm::vec3(dino.ambient, dino.ambient, dino.ambient) * light0.color);
     shader.setVec3((char*)"light[1].ambient", glm::vec3(dino.ambient, dino.ambient, dino.ambient) * light1.color);
 
@@ -144,7 +141,7 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
     lastX = xpos;
     lastY = ypos;
 
-    float sensitivity = 0.05f;
+    float sensitivity = 0.04f;
     xOffset *= sensitivity;
     yOffset *= sensitivity;
 

@@ -14,11 +14,9 @@ std::vector<float> ObjReader::read(char* path) {
 	glm::vec3 tmp;
 	std::vector<glm::vec3> vertex;
 	vertex.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	// std::vector<glm::vec3> face;
 	std::vector<float> allData; // vertex + normal
 	while (objFile >> dataType) {
 		objFile >> tmp.x >> tmp.y >> tmp.z;
-		// std::cout << dataType << ": " << tmp.x << " " << tmp.y << " " << tmp.z << "\n";
 		if (dataType == 'v') {
 			vertex.push_back(tmp);
 			if (tmp.x < left) left = tmp.x;

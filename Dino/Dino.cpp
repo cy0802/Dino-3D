@@ -9,7 +9,6 @@ Dino::Dino() {
 	rotationX = rotationY = rotationZ = glm::mat4(1.0f);
 }
 void Dino::rotate(float angle, char axis) {
-	// float angle = direction / 1.0 / abs(direction);
 	if (axis == 'x') {
 		rotationX = rotationX * glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
 	} else if (axis == 'y') {

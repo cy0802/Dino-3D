@@ -139,7 +139,6 @@
   <ItemGroup>
     <ClCompile Include="..\Dino\Dino.cpp" />
     <ClCompile Include="..\Includes\glad\glad.c" />
-    <ClCompile Include="..\Light\Light.cpp" />
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\ObjReader\ObjReader.cpp" />
     <ClCompile Include="..\Shader\Shader.cpp" />
