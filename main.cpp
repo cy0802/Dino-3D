@@ -19,11 +19,16 @@ void processInput(GLFWwindow* window);
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
     GLsizei length, const GLchar* message, const void* userParam);
-Light light0(glm::vec3(1.0f, 1.0f, 3.0f));
-Light light1(glm::vec3(-1.0f, -1.0f, 3.0f));
+Light light0(glm::vec3(1.0f, -1.0f, 1.0f));
+// Light light1(glm::vec3(1.0f, -1.0f, 1.0f));
 glm::vec3 camera = glm::vec3(0.0, 0.0, 0.0);
-Object object((char*)"..\\resource\\tiger.obj", (char*)"..\\resource\\tiger.mtl", (char*)"..\\resource\\tiger-altas.jpg");
-
+// Object object((char*)"..\\resource\\tiger.obj", (char*)"..\\resource\\tiger.mtl", (char*)"..\\resource\\tiger-atlas.jpg");
+Object object((char*)"..\\resource\\buddha.obj", (char*)"..\\resource\\buddha.mtl", (char*)"..\\resource\\buddha-atlas.jpg");
+enum ObjectType {
+    TIGER,
+    BUDDHA
+};
+ObjectType objectType = TIGER;
 // for mouse input
 float lastX = 0.0f;
 float lastY = 0.0f;
@@ -32,10 +37,11 @@ float horizontal = 0.0f;
 
 int main() {
     init();
+    
    //  Shader shader((char*)"..\\Object\\object.vs", (char*)"..\\Object\\object.fs");
     object.shader = Shader((char*)"..\\resource\\object.vs", (char*)"..\\resource\\object.fs");
 
-    light1.color = glm::vec3(0.827451, 0.788235, 0.705882);
+    // light1.color = glm::vec3(0.827451, 0.788235, 0.705882);
 
     unsigned int VAO, VBO;
     glGenVertexArrays(1, &VAO);
@@ -70,7 +76,7 @@ int main() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 60000);
+        glDrawArrays(GL_TRIANGLES, 0, sizeof(object.data) / sizeof(float) / 8.0);
         GLenum error = glGetError();
         if (error != GL_NO_ERROR) {
             std::cout << "OpenGL Error: " << error << std::endl;
@@ -101,7 +107,7 @@ void init() {
         glfwTerminate();
     }
     glfwMakeContextCurrent(window);
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouseCallback);
     // glad: load all OpenGL function pointers
     // ---------------------------------------

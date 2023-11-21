@@ -17,11 +17,17 @@ std::vector<float> ObjReader::read(char* path) {
 	texture.push_back(glm::vec2(0.0f, 0.0f));
 	vertex.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	std::vector<float> allData; // vertex + normal + texture coord
+	int cnt = 0;
+	double _min = 200.0;
 	while (objFile >> dataType) {
-
+		cnt++;
 		if (dataType.compare("v") == 0) {
 			glm::vec3 tmp;
 			objFile >> tmp.x >> tmp.y >> tmp.z;
+			if (abs(tmp.x) < _min) _min = tmp.x;
+			if (abs(tmp.y) < _min) _min = tmp.y;
+			if (abs(tmp.z) < _min) _min = tmp.z;
+			// if(cnt > 100 && cnt < 300) std::cout << tmp.x << " " << tmp.y << " " << tmp.z << " " << _min << "\n";
 			vertex.push_back(tmp);
 			if (tmp.x < left) left = tmp.x;
 			if (tmp.x > right) right = tmp.x;
@@ -72,8 +78,11 @@ std::vector<float> ObjReader::read(char* path) {
 	allData.push_back(right - left);
 	allData.push_back(top - bottom);
 	allData.push_back(near - far);
+	std::cout << "minimum value of vertex data: " << _min << "\n";
 	std::cout << "number of vertex: " << vertex.size() - 1 << "\n";
+	std::cout << "number of texture coordinate: " << texture.size() << "\n";
 	std::cout << "number of face: " << allData.size() / 18 << "\n";
+	std::cout << "read " << cnt << " lines\n";
 	std::cout << "max width: " << right - left << "\n";
 	std::cout << "max height: " << top - bottom << "\n";
 	std::cout << "max depth: " << near - far << "\n";

@@ -8,11 +8,14 @@ Object::Object(char* objfile, char* mtlfile, char* textureImg) {
 	std::vector<float> v = ObjReader::read(objfile);
 	float _scale = *(v.end() - 1);
 	if (*(v.end() - 2) > _scale) _scale = *(v.end() - 2);
-	if (*(v.end() - 3) > _scale) _scale = *(v.end() - 2);
+	if (*(v.end() - 3) > _scale) _scale = *(v.end() - 3);
 	this->scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0/_scale, 1.0/_scale, 1.0/_scale));
-	std::copy(v.begin(), v.end(), data);
+    // std::cout << "scale: " << 100.0 / _scale << "\n";
+    // this->scale = glm::scale(glm::mat4(1.0f), glm::vec3(100.0 / _scale, 100.0 / _scale, 100.0 / _scale));
+    std::copy(v.begin(), v.end(), data);
 	rotationX = rotationY = rotationZ = glm::mat4(1.0f);
     readMtl(mtlfile);
+    this->texturePath = textureImg;
 }
 void Object::readMtl(char* mtlPath) {
     // read mtl: material file
@@ -56,17 +59,18 @@ void Object::setup(Light light, glm::vec3 camera) {
     this->shader.setMat4((char*)"model", this->model);
 
     this->shader.setVec3((char*)"objectColor", this->color);
+    // this->shader.setMat4((char*)"local", this->rotation);
     this->shader.setMat4((char*)"local", this->rotation * this->scale);
     this->shader.setVec3((char*)"viewPos", camera);
 
-    this->shader.setVec3((char*)"light[0].position", light.position);
-    this->shader.setVec3((char*)"light[0].color", light.color);
-    this->shader.setVec3((char*)"light[0].ambient", 
+    this->shader.setVec3((char*)"light.position", light.position);
+    this->shader.setVec3((char*)"light.color", light.color);
+    this->shader.setVec3((char*)"light.ambient", 
         glm::vec3(this->ambient.x, this->ambient.y, this->ambient.z) * light.color);
-    this->shader.setVec3((char*)"light[1].position", light.position);
-    this->shader.setVec3((char*)"light[1].color", light.color);
-    this->shader.setVec3((char*)"light[1].ambient",
-        glm::vec3(this->ambient.x, this->ambient.y, this->ambient.z) * light.color);
+    // this->shader.setVec3((char*)"light[1].position", light.position);
+    // this->shader.setVec3((char*)"light[1].color", light.color);
+    // this->shader.setVec3((char*)"light[1].ambient",
+    //     glm::vec3(this->ambient.x, this->ambient.y, this->ambient.z) * light.color);
 }
 unsigned int Object::loadTexture() {
     glGenTextures(1, &this->texture);
@@ -81,7 +85,8 @@ unsigned int Object::loadTexture() {
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
     // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-    unsigned char* textureImg = stbi_load("..\\resource\\tiger-atlas.jpg", &width, &height, &nrChannels, 0);
+    std::cout << "(loadTexture): " << this->texturePath << std::endl;
+    unsigned char* textureImg = stbi_load(this->texturePath, &width, &height, &nrChannels, 0);
     if (textureImg) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureImg);
         glGenerateMipmap(GL_TEXTURE_2D);
