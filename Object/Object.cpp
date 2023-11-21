@@ -12,6 +12,42 @@ Object::Object(char* objfile, char* mtlfile, char* textureImg) {
 	this->scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0/_scale, 1.0/_scale, 1.0/_scale));
 	std::copy(v.begin(), v.end(), data);
 	rotationX = rotationY = rotationZ = glm::mat4(1.0f);
+    readMtl(mtlfile);
+}
+void Object::readMtl(char* mtlPath) {
+    // read mtl: material file
+    std::ifstream mtlFile;
+    mtlFile.open(mtlPath);
+    if (mtlFile.fail()) {
+        std::cout << "error while opening the mtl file\n";
+        char buffer[500];
+        strerror_s(buffer, 500, errno);
+        std::cout << "Error: " << buffer;
+        exit(1);
+    }
+    else {
+        std::cout << "open mtl file successfully\n";
+    }
+    std::string dataType;
+    while (mtlFile >> dataType) {
+        if (dataType.compare("Ka") == 0) {
+            mtlFile >> ambient.x >> ambient.y >> ambient.z;
+        }
+        else if (dataType.compare("Kd") == 0) {
+            mtlFile >> diffuse.x >> diffuse.y >> diffuse.z;
+        }
+        else if (dataType.compare("Ks") == 0) {
+            mtlFile >> specular.x >> specular.y >> specular.z;
+        }
+        else if (dataType.compare("Ns") == 0) {
+            mtlFile >> opticalDensity;
+        }
+        else {
+            char buf[100];
+            mtlFile.getline(buf, 100);
+            // std::cout << buf << "\n";
+        }
+    }
 }
 void Object::setup(Light light, glm::vec3 camera) {
     this->shader.use();
@@ -26,11 +62,11 @@ void Object::setup(Light light, glm::vec3 camera) {
     this->shader.setVec3((char*)"light[0].position", light.position);
     this->shader.setVec3((char*)"light[0].color", light.color);
     this->shader.setVec3((char*)"light[0].ambient", 
-        glm::vec3(this->ambient, this->ambient, this->ambient) * light.color);
+        glm::vec3(this->ambient.x, this->ambient.y, this->ambient.z) * light.color);
     this->shader.setVec3((char*)"light[1].position", light.position);
     this->shader.setVec3((char*)"light[1].color", light.color);
     this->shader.setVec3((char*)"light[1].ambient",
-        glm::vec3(this->ambient, this->ambient, this->ambient) * light.color);
+        glm::vec3(this->ambient.x, this->ambient.y, this->ambient.z) * light.color);
 }
 unsigned int Object::loadTexture() {
     glGenTextures(1, &this->texture);
