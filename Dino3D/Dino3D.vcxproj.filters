@@ -49,10 +49,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Object\object.fs">
+    <None Include="..\resource\object.vs">
       <Filter>來源檔案</Filter>
     </None>
-    <None Include="..\Object\object.vs">
+    <None Include="..\resource\object.fs">
       <Filter>來源檔案</Filter>
     </None>
   </ItemGroup>

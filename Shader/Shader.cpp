@@ -1,5 +1,7 @@
 #include "Shader.h"
-
+Shader::Shader() {
+	id = -1;
+};
 Shader::Shader(char* verShaderPath, char* fragShaderPath) {
 	std::string verCode, fragCode;
 	std::ifstream verFile, fragFile;

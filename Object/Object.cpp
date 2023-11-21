@@ -1,7 +1,10 @@
+#pragma once
 #include "Object.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "../Includes/stb_image.h"
-Object::Object(char* objfile, char* mtlfile, char* verShader, char* fragShader, char* textureImg) {
+
+
+Object::Object(char* objfile, char* mtlfile, char* textureImg) {
 	std::vector<float> v = ObjReader::read(objfile);
 	float _scale = *(v.end() - 1);
 	if (*(v.end() - 2) > _scale) _scale = *(v.end() - 2);
@@ -10,10 +13,28 @@ Object::Object(char* objfile, char* mtlfile, char* verShader, char* fragShader, 
 	std::copy(v.begin(), v.end(), data);
 	rotationX = rotationY = rotationZ = glm::mat4(1.0f);
 }
+void Object::setup(Light light, glm::vec3 camera) {
+    this->shader.use();
+    this->shader.setInt((char*)"texture_", 0);
+    this->shader.setMat4((char*)"projection", this->projection);
+    this->shader.setMat4((char*)"model", this->model);
+
+    this->shader.setVec3((char*)"objectColor", this->color);
+    this->shader.setMat4((char*)"local", this->rotation * this->scale);
+    this->shader.setVec3((char*)"viewPos", camera);
+
+    this->shader.setVec3((char*)"light[0].position", light.position);
+    this->shader.setVec3((char*)"light[0].color", light.color);
+    this->shader.setVec3((char*)"light[0].ambient", 
+        glm::vec3(this->ambient, this->ambient, this->ambient) * light.color);
+    this->shader.setVec3((char*)"light[1].position", light.position);
+    this->shader.setVec3((char*)"light[1].color", light.color);
+    this->shader.setVec3((char*)"light[1].ambient",
+        glm::vec3(this->ambient, this->ambient, this->ambient) * light.color);
+}
 unsigned int Object::loadTexture() {
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glGenTextures(1, &this->texture);
+    glBindTexture(GL_TEXTURE_2D, this->texture);
     // set the texture wrapping parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -36,7 +57,7 @@ unsigned int Object::loadTexture() {
         std::cout << stbi_failure_reason() << std::endl;
     }
     stbi_image_free(textureImg);
-    return texture;
+    return this->texture;
 }
 void Object::rotate(float angle, char axis) {
 	if (axis == 'x') {
