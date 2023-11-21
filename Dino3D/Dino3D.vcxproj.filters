@@ -18,9 +18,6 @@
     <ClCompile Include="..\main.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
-    <ClCompile Include="..\Dino\Dino.cpp">
-      <Filter>來源檔案</Filter>
-    </ClCompile>
     <ClCompile Include="..\ObjReader\ObjReader.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
@@ -30,11 +27,11 @@
     <ClCompile Include="..\Shader\Shader.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
+    <ClCompile Include="..\Object\Object.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Dino\Dino.h">
-      <Filter>標頭檔</Filter>
-    </ClInclude>
     <ClInclude Include="..\ObjReader\ObjReader.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
@@ -47,12 +44,15 @@
     <ClInclude Include="..\Light\Light.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
+    <ClInclude Include="..\Object\Object.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Dino\dino.vs">
+    <None Include="..\Object\object.fs">
       <Filter>來源檔案</Filter>
     </None>
-    <None Include="..\Dino\dino.fs">
+    <None Include="..\Object\object.vs">
       <Filter>來源檔案</Filter>
     </None>
   </ItemGroup>

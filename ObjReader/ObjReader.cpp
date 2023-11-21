@@ -6,18 +6,22 @@ std::vector<float> ObjReader::read(char* path) {
 	if (objFile.fail()) {
 		std::cout << "error while opening the obj file\n";
 		exit(1);
-	} else {
+	}
+	else {
 		std::cout << "open file successfully\n";
 	}
-	char dataType;
+	std::string dataType;
 	float left = 300.0, right = -300.0, bottom = 300.0, top = -300.0, near = -300.0, far = 300.0;
-	glm::vec3 tmp;
 	std::vector<glm::vec3> vertex;
+	std::vector<glm::vec2> texture;
+	texture.push_back(glm::vec2(0.0f, 0.0f));
 	vertex.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	std::vector<float> allData; // vertex + normal
+	std::vector<float> allData; // vertex + normal + texture coord
 	while (objFile >> dataType) {
-		objFile >> tmp.x >> tmp.y >> tmp.z;
-		if (dataType == 'v') {
+
+		if (dataType.compare("v") == 0) {
+			glm::vec3 tmp;
+			objFile >> tmp.x >> tmp.y >> tmp.z;
 			vertex.push_back(tmp);
 			if (tmp.x < left) left = tmp.x;
 			if (tmp.x > right) right = tmp.x;
@@ -25,20 +29,44 @@ std::vector<float> ObjReader::read(char* path) {
 			if (tmp.y < bottom) bottom = tmp.y;
 			if (tmp.z > near) near = tmp.z;
 			if (tmp.z < far) far = tmp.z;
-		} else if (dataType == 'f') {
-			glm::vec3 _vertex[3];
-			_vertex[0] = vertex[tmp.x]; _vertex[1] = vertex[tmp.y]; _vertex[2] = vertex[tmp.z];
-			glm::vec3 normal = glm::cross(_vertex[1] - _vertex[0], _vertex[2] - _vertex[0]);
+		}
+		else if (dataType.compare("vt") == 0) {
+			glm::vec2 tmp;
+			objFile >> tmp.x >> tmp.y;
+			texture.push_back(tmp);
+		}
+		else if (dataType.compare("f") == 0) {
+			int vertexIdx[3], textureIdx[3];
+			std::string tmp;
+			char ch1, ch2;
+			int temp;
+			std::stringstream ss;
 			for (int i = 0; i < 3; i++) {
-				allData.push_back(_vertex[i].x);
-				allData.push_back(_vertex[i].y);
-				allData.push_back(_vertex[i].z);
-				allData.push_back(normal[0]);
-				allData.push_back(normal[1]);
-				allData.push_back(normal[2]);
+				objFile >> tmp;
+				// std::cout << tmp << " ";
+				ss.clear(); ss << tmp;
+				ss >> vertexIdx[i] >> ch1 >> textureIdx[i] >> ch2 >> temp;
+				// std::cout << vertexIdx[i] << " " << textureIdx[i] << std::endl;
 			}
-		} else {
-			std::cout << "invalid format: " << dataType << " " << tmp.x << " " << tmp.y << " " << tmp.z << "\n";
+			// std::cout << vertexIdx[0] << " " << vertexIdx[1] << " " << vertexIdx[2] << '\n';
+			// std::cout << textureIdx[0] << ' ' << textureIdx[1] << " " << textureIdx[2] << '\n';
+			glm::vec3 normal = glm::cross(vertex[vertexIdx[0]] - vertex[vertexIdx[1]], vertex[vertexIdx[0]] - vertex[vertexIdx[2]]);
+			for (int i = 0; i < 3; i++) {
+				allData.push_back(vertex[vertexIdx[i]].x);
+				allData.push_back(vertex[vertexIdx[i]].y);
+				allData.push_back(vertex[vertexIdx[i]].z);
+				allData.push_back(normal.x);
+				allData.push_back(normal.y);
+				allData.push_back(normal.z);
+				allData.push_back(texture[textureIdx[i]].x);
+				allData.push_back(texture[textureIdx[i]].y);
+			}
+		}
+		else {
+			char buf[100];
+			objFile.getline(buf, 100);
+			// std::cout << buf << '\n';
+			// std::cout << "invalid format: " << dataType << " " << tmp.x << " " << tmp.y << " " << tmp.z << "\n";
 		}
 	}
 	allData.push_back(right - left);

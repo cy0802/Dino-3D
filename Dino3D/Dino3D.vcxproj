@@ -137,22 +137,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Dino\Dino.cpp" />
     <ClCompile Include="..\Includes\glad\glad.c" />
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\Object\Object.cpp" />
     <ClCompile Include="..\ObjReader\ObjReader.cpp" />
     <ClCompile Include="..\Shader\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Dino\Dino.h" />
     <ClInclude Include="..\Includes\glad\glad.h" />
     <ClInclude Include="..\Light\Light.h" />
+    <ClInclude Include="..\Object\Object.h" />
     <ClInclude Include="..\ObjReader\ObjReader.h" />
     <ClInclude Include="..\Shader\Shader.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Dino\dino.fs" />
-    <None Include="..\Dino\dino.vs" />
+    <None Include="..\Object\object.fs" />
+    <None Include="..\Object\object.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,7 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "../Shader/Shader.h"
 #include "../ObjReader/ObjReader.h"
-class Dino {
+class Object {
 public:
 	float data[500000]; // vertex, normal
 	glm::mat4 rotationX, rotationY, rotationZ, rotation;
@@ -13,6 +13,7 @@ public:
 	
 	float ambient = 0.1f;
 	
-	Dino();
+	unsigned int loadTexture();
+	Object(char* objfile, char* mtlfile, char* verShader, char* fragShader, char* textureImg);
 	void rotate(float angle, char axis);
 };

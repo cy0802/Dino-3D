@@ -8,6 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <windows.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "Includes/stb_image.h"
 #include "Shader/Shader.h"
 #include "ObjReader/ObjReader.h" 
 #include "Dino/Dino.h"
@@ -22,7 +24,8 @@ void processInput(GLFWwindow* window);
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
     GLsizei length, const GLchar* message, const void* userParam);
-Dino dino;
+Dino dino((char*)"..\\resource\\tiger.obj", (char*)"..\\resource\\tiger.mtl",
+    (char*)"..\\resource\\dino.vs", (char*)"..\\resource\\dino.fs", (char*)"..\\resource\\tiger-altas.jpg");
 Light light0(glm::vec3(1.0f, 1.0f, 3.0f));
 Light light1(glm::vec3(-1.0f, -1.0f, 3.0f));
 glm::vec3 camera = glm::vec3(0.0, 0.0, 0.0);
@@ -35,7 +38,6 @@ float horizontal = 0.0f;
 
 int main() {
     init();
-    // TestCube testCube;
     Shader shader((char*)"..\\Dino\\dino.vs", (char*)"..\\Dino\\dino.fs");
     light1.color = glm::vec3(0.827451, 0.788235, 0.705882);
 
@@ -47,10 +49,38 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(dino.data), dino.data, GL_STATIC_DRAW);
 
     // position attribute: vertex and normal
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(GL_FLOAT)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(GL_FLOAT)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(GL_FLOAT)));
+    glEnableVertexAttribArray(2);
+
+    unsigned int texture = dino.loadTexture();
+    //glGenTextures(1, &texture);
+    //glBindTexture(GL_TEXTURE_2D, texture);
+    //// set the texture wrapping parameters
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    //// set texture filtering parameters
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //// load image, create texture and generate mipmaps
+    //int width, height, nrChannels;
+    //stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    //// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
+    //unsigned char* textureImg = stbi_load("..\\resource\\tiger-atlas.jpg", &width, &height, &nrChannels, 0);
+    //if (textureImg) {
+    //    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureImg);
+    //    glGenerateMipmap(GL_TEXTURE_2D);
+    //    std::cout << "successfully load texture\nheight = " << height
+    //        << ", width = " << width << '\n';
+    //} else {
+    //    std::cout << "Failed to load texture" << std::endl;
+    //    std::cout << stbi_failure_reason() << std::endl;
+    //}
+    //stbi_image_free(textureImg);
+
     glm::mat4 projection = glm::ortho(0.7, -0.7, 0.7, -0.7, -1.5, 1.5);
     glm::mat4 model = glm::mat4(1.0f);
 
@@ -60,6 +90,7 @@ int main() {
     dino.rotate(90.0, 'x');
 
     shader.use();
+    shader.setInt((char*)"texture_", 0);
     shader.setMat4((char*)"projection", projection);
     shader.setMat4((char*)"model", model);
 
@@ -86,7 +117,9 @@ int main() {
         shader.setMat4((char*)"view", view * translate);
         shader.setVec3((char*)"viewPos", camera);
         t += 0.2;
-
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 60000);
         GLenum error = glGetError();
@@ -119,7 +152,7 @@ void init() {
         glfwTerminate();
     }
     glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouseCallback);
     // glad: load all OpenGL function pointers
     // ---------------------------------------
