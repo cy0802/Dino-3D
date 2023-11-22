@@ -65,8 +65,12 @@ void Object::setup(Light light, glm::vec3 camera) {
 
     this->shader.setVec3((char*)"light.position", light.position);
     this->shader.setVec3((char*)"light.color", light.color);
-    this->shader.setVec3((char*)"light.ambient", 
-        glm::vec3(this->ambient.x, this->ambient.y, this->ambient.z) * light.color);
+
+    this->shader.setVec3((char*)"material.ambient", this->ambient);
+    this->shader.setVec3((char*)"material.diffuse", this->diffuse);
+    this->shader.setVec3((char*)"material.specular", this->specular);
+    // this->shader.setVec3((char*)"light.ambient", 
+    //     glm::vec3(this->ambient.x, this->ambient.y, this->ambient.z) * light.color);
     // this->shader.setVec3((char*)"light[1].position", light.position);
     // this->shader.setVec3((char*)"light[1].color", light.color);
     // this->shader.setVec3((char*)"light[1].ambient",

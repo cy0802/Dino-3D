@@ -30,13 +30,13 @@ void main(){
     
     vec3 result = calcLight(light, normalized, viewDir);
     
-	FragColor = texture(texture_, texCoord) * vec4(result * objectColor, 1.0);
+	FragColor = texture(texture_, texCoord) * vec4(result, 1.0);
 }
 
 vec3 calcLight(Light light, vec3 normal, vec3 viewDir){
     vec3 lightDir = normalize(light.position - fragPos);
     
-    vec3 diffuse = max(dot(normal, lightDir), 0.0) * material.diffuse; // * light.color
+    vec3 diffuse = 2 * max(dot(normal, lightDir), 0.0) * material.diffuse; // * light.color
     
     vec3 reflectDir = reflect(-lightDir, normal);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
@@ -44,5 +44,6 @@ vec3 calcLight(Light light, vec3 normal, vec3 viewDir){
 
     vec3 ambient = light.color * material.ambient;
     vec3 result = (ambient + diffuse + specular);
+    // result = diffuse;
     return result;
 }
