@@ -1,18 +1,18 @@
-# Robot
+# Texture Mapping
 
-This is an openGL project that draws a 3D dinosaur.
+This is an openGL project that draws a 3D tiger and buddha with texture.
 
-There are two light sources in the scene, and Phong shading is used.
+There is a light sources in the scene, and Phong shading is used.
 
 
 ## Demonstration
 
-![Imgur](https://i.imgur.com/502X0uo.png)
+![Imgur](https://i.imgur.com/o4HlSeE.png)
 
-![Imgur](https://i.imgur.com/Hr4TqUg.png)
+![Imgur](https://i.imgur.com/3EPI0Vf.png)
 
 
 
 ## Operation
-
-By simply moving your mouse up and down, left and right, you can control the camera and observe the dinosaur from different viewpoint.
+- Press left and right key on your keyboard to rotate the object
+- Press `c` to switch tiger to buddha or switch buddha to tiger. It may takes few seconds to load the 3D mesh.
