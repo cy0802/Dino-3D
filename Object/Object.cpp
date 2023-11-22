@@ -5,18 +5,25 @@
 
 
 Object::Object(char* objfile, char* mtlfile, char* textureImg) {
-	std::vector<float> v = ObjReader::read(objfile);
-	float _scale = *(v.end() - 1);
-	if (*(v.end() - 2) > _scale) _scale = *(v.end() - 2);
-	if (*(v.end() - 3) > _scale) _scale = *(v.end() - 3);
-	this->scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0/_scale, 1.0/_scale, 1.0/_scale));
+    this->init(objfile, mtlfile, textureImg);
+}
+
+void Object::init(char* objfile, char* mtlfile, char* textureImg) {
+    std::vector<float> v = ObjReader::read(objfile);
+    float _scale = *(v.end() - 1);
+    if (*(v.end() - 2) > _scale) _scale = *(v.end() - 2);
+    if (*(v.end() - 3) > _scale) _scale = *(v.end() - 3);
+    this->scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0 / _scale, 1.0 / _scale, 1.0 / _scale));
     // std::cout << "scale: " << 100.0 / _scale << "\n";
     // this->scale = glm::scale(glm::mat4(1.0f), glm::vec3(100.0 / _scale, 100.0 / _scale, 100.0 / _scale));
-    std::copy(v.begin(), v.end(), data);
-	rotationX = rotationY = rotationZ = glm::mat4(1.0f);
+    v.pop_back(); v.pop_back(); v.pop_back();
+    this->sizeofData = v.size() / 8;
+    std::copy(v.begin(), v.end(), this->data);
+    rotation = rotationX = rotationY = rotationZ = glm::mat4(1.0f);
     readMtl(mtlfile);
     this->texturePath = textureImg;
 }
+
 void Object::readMtl(char* mtlPath) {
     // read mtl: material file
     std::ifstream mtlFile;
@@ -69,12 +76,6 @@ void Object::setup(Light light, glm::vec3 camera) {
     this->shader.setVec3((char*)"material.ambient", this->ambient);
     this->shader.setVec3((char*)"material.diffuse", this->diffuse);
     this->shader.setVec3((char*)"material.specular", this->specular);
-    // this->shader.setVec3((char*)"light.ambient", 
-    //     glm::vec3(this->ambient.x, this->ambient.y, this->ambient.z) * light.color);
-    // this->shader.setVec3((char*)"light[1].position", light.position);
-    // this->shader.setVec3((char*)"light[1].color", light.color);
-    // this->shader.setVec3((char*)"light[1].ambient",
-    //     glm::vec3(this->ambient.x, this->ambient.y, this->ambient.z) * light.color);
 }
 unsigned int Object::loadTexture() {
     glGenTextures(1, &this->texture);

@@ -16,14 +16,18 @@ const unsigned int SCR_HEIGHT = 1300;
 GLFWwindow* window;
 void init();
 void processInput(GLFWwindow* window);
-void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+// void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
     GLsizei length, const GLchar* message, const void* userParam);
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 Light light0(glm::vec3(1.0f, -1.0f, 1.0f));
 // Light light1(glm::vec3(1.0f, -1.0f, 1.0f));
-glm::vec3 camera = glm::vec3(0.0, 0.0, 0.0);
-// Object object((char*)"..\\resource\\tiger.obj", (char*)"..\\resource\\tiger.mtl", (char*)"..\\resource\\tiger-atlas.jpg");
-Object object((char*)"..\\resource\\buddha.obj", (char*)"..\\resource\\buddha.mtl", (char*)"..\\resource\\buddha-atlas.jpg");
+// glm::vec3 camera = glm::vec3(0.887199, -0.181206, -0.424313);
+glm::vec3 camera = glm::vec3(1.0, -0.0, 0.0);
+Object object((char*)"..\\resource\\tiger.obj", (char*)"..\\resource\\tiger.mtl", (char*)"..\\resource\\tiger-atlas.jpg");
+// Object object((char*)"..\\resource\\buddha.obj", (char*)"..\\resource\\buddha.mtl", (char*)"..\\resource\\buddha-atlas.jpg");
+unsigned int VAO, VBO;
+unsigned int texture;
 enum ObjectType {
     TIGER,
     BUDDHA
@@ -42,8 +46,7 @@ int main() {
     object.shader = Shader((char*)"..\\resource\\object.vs", (char*)"..\\resource\\object.fs");
 
     // light1.color = glm::vec3(0.827451, 0.788235, 0.705882);
-
-    unsigned int VAO, VBO;
+   
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
@@ -58,7 +61,12 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(GL_FLOAT)));
     glEnableVertexAttribArray(2);
 
-    unsigned int texture = object.loadTexture();
+    texture = object.loadTexture();
+    
+    // buddha
+    // object.rotate(90.0, 'x');
+    // object.rotate(100.0, 'z');
+    // tiger
     object.rotate(180.0, 'x');
     object.setup(light0, camera);
     while (!glfwWindowShouldClose(window)) {
@@ -66,17 +74,19 @@ int main() {
         glClearColor(0.8, 0.8, 0.8, 0.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
         glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         glm::vec3 viewpos = glm::vec3(0.0f, 0.0f, 0.0f);
         glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
         glm::mat4 view = glm::lookAt(camera, viewpos, up);
         object.shader.setMat4((char*)"view", view * translate);
         object.shader.setVec3((char*)"viewPos", camera);
+        object.shader.setMat4((char*)"local", object.rotation * object.scale);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, sizeof(object.data) / sizeof(float) / 8.0);
+        glDrawArrays(GL_TRIANGLES, 0, object.sizeofData);
         GLenum error = glGetError();
         if (error != GL_NO_ERROR) {
             std::cout << "OpenGL Error: " << error << std::endl;
@@ -107,8 +117,9 @@ void init() {
         glfwTerminate();
     }
     glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetKeyCallback(window, keyCallback);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetCursorPosCallback(window, mouseCallback);
     // glad: load all OpenGL function pointers
     // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -123,25 +134,34 @@ void processInput(GLFWwindow* window) {
         glfwSetWindowShouldClose(window, true);
 }
 
-void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
-    float xOffset = lastX - xpos;
-    float yOffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
-
-    float sensitivity = 0.04f;
-    xOffset *= sensitivity;
-    yOffset *= sensitivity;
-
-    horizontal += xOffset;
-    vertical += yOffset;
-
-    // camera = glm::vec3(cos(glm::radians(horizontal), cos))
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(horizontal)) * cos(glm::radians(vertical));
-    direction.y = sin(glm::radians(vertical));
-    direction.z = sin(glm::radians(horizontal)) * cos(glm::radians(vertical));
-    camera = glm::normalize(direction);
+// TODO: bug here
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    std::cout << "keyCallback()\n";
+    if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+        if (key == GLFW_KEY_LEFT) {
+            if (objectType == BUDDHA) object.rotate(-2.0, 'z');
+            else object.rotate(-2.0, 'y');
+        }
+        if (key == GLFW_KEY_RIGHT) {
+            if (objectType == BUDDHA) object.rotate(2.0, 'z');
+            else object.rotate(2.0, 'y');
+        }
+        if (key == GLFW_KEY_C) {
+            if (objectType == TIGER) {
+                object.init((char*)"..\\resource\\buddha.obj", (char*)"..\\resource\\buddha.mtl", (char*)"..\\resource\\buddha-atlas.jpg");
+                object.rotate(90.0, 'x');
+                object.rotate(100.0, 'z');
+                objectType = BUDDHA;
+            } else {
+                object.init((char*)"..\\resource\\tiger.obj", (char*)"..\\resource\\tiger.mtl", (char*)"..\\resource\\tiger-atlas.jpg");
+                object.rotate(180.0, 'x');
+                objectType = TIGER;
+            }
+            glBufferData(GL_ARRAY_BUFFER, sizeof(object.data), object.data, GL_STATIC_DRAW);
+            texture = object.loadTexture();
+            object.setup(light0, camera);
+        }
+    }
 }
 
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id,
